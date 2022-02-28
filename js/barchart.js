@@ -16,13 +16,15 @@ const margin = {left:50, right:50, bottom:50, top:50};
 const yTooltipOffset = 15; 
 
 
-// TODO: What does this code do? 
+// TODO: What does this code do? Add a svg within the viewBox under hard-coded-bar div within the margins
+
 const svg1 = d3
   .select("#hard-coded-bar")
   .append("svg")
   .attr("width", width-margin.left-margin.right)
   .attr("height", height - margin.top - margin.bottom)
   .attr("viewBox", [0, 0, width, height]);
+
 
 // Hardcoded barchart data
 const data1 = [
@@ -41,27 +43,27 @@ const data1 = [
 
 */ 
 
-// TODO: What does this code do? 
+// TODO: What does this code do? Get max score from the data
 let maxY1 = d3.max(data1, function(d) { return d.score; });
 
-// TODO: What does each line of this code do?   
+// TODO: What does each line of this code do?  Set the scaling function for the y axis 
 let yScale1 = d3.scaleLinear()
             .domain([0,maxY1])
             .range([height-margin.bottom,margin.top]); 
 
-// TODO: What does each line of this code do? 
+// TODO: What does each line of this code do? Set the scaling function for the x axis 
 let xScale1 = d3.scaleBand()
             .domain(d3.range(data1.length))
             .range([margin.left, width - margin.right])
             .padding(0.1); 
 
-// TODO: What does each line of this code do?  
+// TODO: What does each line of this code do? Add the y axis to page  
 svg1.append("g")
    .attr("transform", `translate(${margin.left}, 0)`) 
    .call(d3.axisLeft(yScale1)) 
    .attr("font-size", '20px'); 
 
-// TODO: What does each line of this code do? 
+// TODO: What does each line of this code do? Add the x axis to page
 svg1.append("g")
     .attr("transform", `translate(0,${height - margin.bottom})`) 
     .call(d3.axisBottom(xScale1) 
@@ -74,7 +76,7 @@ svg1.append("g")
 
 */
 
-// TODO: What does each line of this code do? 
+// TODO: What does each line of this code do? Select hard-coded-bar div and append another div with attributes 
 const tooltip1 = d3.select("#hard-coded-bar") 
                 .append("div") 
                 .attr('id', "tooltip1") 
@@ -104,7 +106,7 @@ const mouseleave1 = function(event, d) {
 
 */
 
-// TODO: What does each line of this code do? 
+// TODO: What does each line of this code do? Select all,, assign to class bar, set height/width, pos of bars, link event lister of bar to event handler
 svg1.selectAll(".bar") 
    .data(data1) 
    .enter()  
@@ -119,9 +121,54 @@ svg1.selectAll(".bar")
      .on("mouseleave", mouseleave1);
 
 
+//
+
+let svg2 = d3.select("body")
+            .append("svg")
+              .attr("class", "holder")
+              .attr("width", width-margin.left-margin.right)
+              .attr("height", height - margin.top - margin.bottom)
+              .attr("viewBox", [0, 0, width, height]);
 
 
+d3.csv("data/barchart.csv").then((data) => { 
+  console.log(data);   
+  
+  svg2.selectAll("bar") 
+    .data(data) // this is passed into the anonymous function
+    .enter()  
+    .append("rect")
+      .attr("class", "bar") 
+     .attr("x", (d,i) => xScale1(i)) 
+     .attr("y", (d) => yScale1(d.score)) 
+     .attr("height", (d) => (height - margin.bottom) - yScale1(d.score)) 
+     .attr("width", xScale1.bandwidth()) //.attr("fill", (d) => { return d.color; }); // fill by color
 
+
+  let maxY2 = d3.max(data, function(d) { return d.score; });
+  console.log("2222");
+  // TODO: What does each line of this code do?  Set the scaling function for the y axis 
+  let yScale2 = d3.scaleLinear()
+            .domain([0,maxY2])
+            .range([height-margin.bottom,margin.top]); 
+
+// TODO: What does each line of this code do? Set the scaling function for the x axis 
+  let xScale2 = d3.scaleBand()
+            .domain(d3.range(data.length))
+            .range([margin.left, width - margin.right])
+            .padding(0.1); 
+
+svg2.append("g")
+   .attr("transform", `translate(${margin.left}, 0)`) 
+   .call(d3.axisLeft(yScale2)) 
+   .attr("font-size", '20px'); 
+
+svg2.append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`) 
+    .call(d3.axisBottom(xScale2) 
+            .tickFormat(i => data1[i].name))  
+    .attr("font-size", '20px'); 
+});
 
 
 
